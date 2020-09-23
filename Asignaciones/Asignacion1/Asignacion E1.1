@@ -1,0 +1,177 @@
+//Incluimos las librerias que utilizaremos.
+#include <iostream>
+#include <vector>
+#include <ctime>
+#include <chrono>
+#include <thread>
+
+//Declaraciones para el uso de namespace std.
+using namespace std;
+using namespace std::this_thread;
+using namespace std::chrono;
+
+//Creamos el main del programa
+int main()
+{
+	//Declaramos el maximo inventario de las "herbs" y los "minerals"
+	const int herbsInventoryMaxSpace = 5;
+	const int mineralsInventoryMaxSpace = 3;
+
+	//Declaramos los espacios disponibles en el inventario.
+	int herbsInventoryOccupied = 0;
+	int mineralsInventoryOccupied = 0;
+
+	//Declaramos los vectores que contienen los materiales a recolectar.
+	const vector<string> minerals{ "Cristal Azul (A)", "Cristal Verde (V)" };
+	const vector<string> herbs{ "Verila Pluma (VP)", "Secta Doralis (SD)", "Crystalia Fumilis (CF)" };
+
+	//Declaramos una variable para almacenar en una posicion random dentro del inventario de herbs o de minerals.
+	int randomMineralsPos;
+	int randomHerbsPos;
+
+	//Vector que representara el inventario.
+	vector<string> herbsInventory;
+	vector<string> mineralsInventory;
+
+	//Creamos la variable de entrada del usuario.
+	string userInput;
+
+	//srand() para crear un seed distinto.
+	srand(time(0));
+
+	// Variables para determinar el valor minimo y maximo de random
+	const int min = 0;
+	const int mineralsMax = minerals.size() - 1;
+	const int herbsMax = herbs.size() - 1;
+
+	while (userInput != "exit" && userInput != "0")
+	{
+		//Creamos un menu para que el usario sepa lo que debe introducir.
+		cout << "====================================================" << endl;
+		cout << "Menu Principal" << "\n" << endl;
+		cout << "1. Introduzca H o h para recoger hierbas." << endl;
+		cout << "2. Introduzca M o m para minar." << endl;
+		cout << "3. Introduzca I o i para abrir el inventario." << endl;
+		cout << "4. Introduzca exit o 0 para salir." << endl;
+		cout << "====================================================" << endl;
+
+		//Leemos la entrada del usuario
+		cout << "Esperando la entrada del usuario: "; cin >> userInput; cout << "\n";
+		system("CLS");
+
+		// if para cuando el usario introduzca las letras h o H.
+		if (userInput == "h" || userInput == "H")
+		{
+			// if para agregar el material si hay espacio
+			if (herbsInventoryOccupied < herbsInventoryMaxSpace)
+			{
+				//Libreria chrono y thread nos ayudan a crear un temporizador.
+				cout << "Recogiendo . ";
+				sleep_for(milliseconds(500));
+				cout << ". ";
+				sleep_for(milliseconds(500));
+				cout << ".\n\n";
+
+				//Generamos la posicion random dentro del vector de herbs.
+				randomHerbsPos = rand() % (herbsMax - min + 1) + min;
+
+				//Informamos el material que recogio y aumentamos el espacio ocupado por el mismo.
+				cout << "Has obtenido: " << herbs[randomHerbsPos] << "\n\n";
+				herbsInventoryOccupied++;
+
+				//Agregamos el objeto al inventario de hierbas.
+				herbsInventory.push_back(herbs[randomHerbsPos]);
+
+				//Le informamos al usario el espacio que tiene disponible.
+				cout << "Has recogido " << herbsInventoryOccupied << " de " << herbsInventoryMaxSpace << " hierbas." << "\n\n";
+				cout << "Tienes " << mineralsInventoryOccupied << " de " << mineralsInventoryMaxSpace << " disponible en tu inventario de minerales." << "\n\n";
+			}
+			else
+			{
+				//Le informamos al usario que su inventario se encuentra lleno.
+				cout << "INVENTARIO DE HIERBAS LLENO." << "\n\n";
+			}
+			system("PAUSE");
+			system("CLS");
+		}
+		if (userInput == "m" || userInput == "M")
+		{
+			// if para agregar el material si hay espacio
+			if (mineralsInventoryOccupied < mineralsInventoryMaxSpace)
+			{
+				//Libreria chrono y thread nos ayudan a crear un temporizador.
+				cout << "Minando . ";
+				sleep_for(milliseconds(500));
+				cout << ". ";
+				sleep_for(milliseconds(500));
+				cout << ".\n\n";
+
+				//Generamos la posicion random dentro del vector de minerals.
+				randomMineralsPos = rand() % (mineralsMax - min + 1) + min;
+
+				//Informamos el material que recogio y aumentamos el espacio ocupado por el mismo.
+				cout << "Has obtenido: " << minerals[randomMineralsPos] << "\n\n";
+				mineralsInventoryOccupied++;
+
+				//Agregamos el objeto al inventario de minerales.
+				mineralsInventory.push_back(minerals[randomMineralsPos]);
+
+				//Le informamos al usario el espacio que tiene disponible.
+				cout << "Has minado " << mineralsInventoryOccupied << " de " << mineralsInventoryMaxSpace << " minerales." << "\n\n";
+				cout << "Tienes " << herbsInventoryOccupied << " de " << herbsInventoryMaxSpace << " disponible en tu inventario de hierbas." << "\n\n";
+			}
+			else
+			{
+				//Le informamos al usario que su inventario se encuentra lleno.
+				cout << "INVENTARIO DE MINERALES LLENO." << "\n\n";
+			}
+			system("PAUSE");
+			system("CLS");
+		}
+		else if (userInput == "i" || userInput == "I")
+		{
+			//Libreria chrono y thread nos ayudan a crear un temporizador de abriendo el inventario.
+			cout << "Abriendo inventario . ";
+			sleep_for(milliseconds(500));
+			cout << ". ";
+			sleep_for(milliseconds(500));
+			cout << ".\n\n";
+
+			// if para mostrar el inventario de hierbas si esta vacio o la cantiad que contenga.
+			if (herbsInventoryOccupied == 0)
+			{
+				cout << "INVENTARIO DE HIERBAS VACIO" << "\n\n";
+			}
+			else
+			{
+				//Creamos un ciclo que muestra el inventario de hierbas.
+				for (int i = 0; i < herbsInventory.size(); i++)
+				{
+					cout << herbsInventory[i] << "\n";
+				}
+				// Informamos al usario sus espacios disponibles.
+				cout << "Te quedan " << herbsInventoryMaxSpace - herbsInventoryOccupied << " espacios disponibles" << endl;
+			}
+			cout << "\n";
+
+			// if para mostrar el inventario de minerales si esta vacio o la cantiad que contenga.
+			if (mineralsInventoryOccupied == 0)
+			{
+				cout << "INVENTARIO DE MINERALES VACIO" << "\n\n";
+			}
+			else
+			{
+				//Creamos un ciclo que muestra el inventario de minerales.
+				for (int i = 0; i < mineralsInventory.size(); i++)
+				{
+					cout << mineralsInventory[i] << "\n";
+				}
+				// Informamos al usario sus espacios disponibles.
+				cout << "Te quedan " << mineralsInventoryMaxSpace - mineralsInventoryOccupied  << " espacios disponibles" << endl;
+			}
+			cout << "\n";
+			system("PAUSE");
+			system("CLS");
+		}
+	}
+}
