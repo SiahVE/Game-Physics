@@ -1,0 +1,522 @@
+//Importamos las librerias necesarias.
+#include<iostream>
+#include<vector>
+#include<string>
+#include<ctime>
+
+//Incluimos el namespace std.
+using namespace std;
+
+//Declaramos las funciones a utilizar con punteros y pass by reference.
+vector<string> generateInventory(vector<string> &allItemsRef);
+void pickUpInventory(vector<string> &inventoryRef, vector<string> &allItemsRef);
+void openInventory(vector<string> &inventoryRef, vector<string> &allItemsRef);
+void opaqueCraftMenu(vector<string> &inventoryRef);
+vector<string> replace(string *rC, string *oC, vector<string> &inventoryRef);
+vector<string> replaceCrystal1(string *c1, string *i1, vector<string> &allItemsRef);
+vector<string> replaceCrystal2(string *c2, string *i2, vector<string> &allItemsRef);
+vector<string> replaceCrystal3(string *c3, string *i3, vector<string> &allItemsRef);
+bool createOpaque(string *rC, vector<string> &inventoryRef);
+bool uniqueCrystalVerification(vector<string> &inventoryRef);
+
+//Funcion para generar el inventario realizando un pass by reference.
+vector<string> generateInventory(vector<string> &allItemsRef)
+{
+	//Declaramos el inventario.
+	vector<string> randomInventory(7, "NA");
+
+	//Variables para el uso de rand.
+	int randomItemPos;
+	int min = 0;
+	int max = allItemsRef.size() - 1;
+
+	//Variables booleanos que determinan si hay un cristal en el inventario, para que solo haya un cristal unico y determinar la cantidad maxima de fishermen plate.
+	bool containsCrystal = false;
+	bool longBooleanExpression;
+	bool shortBooleanExpression;
+
+
+	//Variable de contador para el ciclo while.
+	int counter = 0;
+
+	//Ciclo para llenar el inventario de manera aleatoria.
+	while (counter < randomInventory.size())
+	{
+		//Para la posicion random
+		randomItemPos = rand() % (max - min + 1) + min;
+
+		//Verificar que solo exista 1 cristal en el inventario.
+		containsCrystal = uniqueCrystalVerification(randomInventory);
+
+		//Si el item random que se escoge es un cristal y hay un cristal en el inventario, este cambiara a true.
+		longBooleanExpression = ((allItemsRef[randomItemPos] == "Crystallized Azure Dragon's Tears") || (allItemsRef[randomItemPos] == "Crystallized Exiled Heretic's Bone") || (allItemsRef[randomItemPos] == "Crystallized Great Feline's Ash")) && containsCrystal;
+
+		//Si existen 3 fishermen plate en el inventario este se volvera true
+		shortBooleanExpression = (count(randomInventory.begin(), randomInventory.end(), "Fishermen's Plate") >= 3) && (allItemsRef[randomItemPos] == "Fishermen's Plate");
+
+		//Agregara cualquier cosa siempre y cuando no exista un cristal.
+		if (!longBooleanExpression && !shortBooleanExpression)
+		{
+			randomInventory[counter] = allItemsRef[randomItemPos];
+			counter++;
+		}
+	}
+	system("CLS");
+	cout << "INVENTORY GENERATED! \n\n" << endl;
+	system("pause");
+	return randomInventory;
+}
+
+//Funcion para generar nuevos objetos y que el usuario los recoja realizando un pass by reference.
+void pickUpInventory(vector<string> &inventoryRef, vector<string> &allItemsRef)
+{
+	//Vector para los items que se podran recoger.
+	vector<string> pickItemsInventory(5);
+
+	//Variables para entrada del usuario, contador y para crea las posiciones random de los items.
+	int userInput;
+	int randomItemPos;
+	int min = 0;
+	int max = allItemsRef.size() - 1;
+	int counter = 0;
+
+	//Booleanas para mantener el inventario abierto y determinar la cantidad de objetos y cristales sean la cantidad posible(1 cristal y maximo 3 fishermen plate).
+	bool pickUpInventoryOpened = true;
+	bool containsCrystal = false;
+	bool longBooleanExpression;
+	bool shortBooleanExpression;
+
+	//Ciclo que genera los 5 objetos aleatorias para escoger del usuario.
+	while (counter < pickItemsInventory.size())
+	{
+		//Para la posicion random
+		randomItemPos = rand() % (max - min + 1) + min;
+
+		//Verificar que solo exista 1 cristal en el inventario
+		containsCrystal = uniqueCrystalVerification(pickItemsInventory);
+
+		//Si el item random que se escoge es un cristal y hay un cristal en el inventario, este cambiara a true.
+		longBooleanExpression = ((allItemsRef[randomItemPos] == "Crystallized Azure Dragon's Tears") || (allItemsRef[randomItemPos] == "Crystallized Exiled Heretic's Bone") || (allItemsRef[randomItemPos] == "Crystallized Great Feline's Ash")) && containsCrystal;
+
+		//Si existen 3 fishermen plate en el inventario este se volvera true
+		shortBooleanExpression = (count(pickItemsInventory.begin(), pickItemsInventory.end(), "Fishermen's Plate") >= 3) && (allItemsRef[randomItemPos] == "Fishermen's Plate");
+
+		//Agregara cualquier cosa siempre y cuando no exista un cristal
+		if (!longBooleanExpression && !shortBooleanExpression)
+		{
+			pickItemsInventory[counter] = allItemsRef[randomItemPos];
+			counter++;
+		}
+	}
+
+	//Ciclo para mantener el recolector de objetos abierto.
+	while (pickUpInventoryOpened)
+	{
+		system("CLS");
+		cout << "===============================================================" << endl;
+		cout << "= = ITEMS PICK UP = =" << "\n" << endl;
+
+		//Ciclo que itera sobre los pick up items y lo imprime.
+		for (int counter = 0; counter < pickItemsInventory.size(); counter++)
+		{
+			cout << counter + 1 << ". " << pickItemsInventory[counter] << endl;
+		}
+		cout << pickItemsInventory.size() + 1 << ". " << "EXIT" << endl;
+		cout << "===============================================================" << endl;
+		cout << "AWAITING USER INPUT:  "; cin >> userInput;
+
+		//If para determinar los objetos que pasaran al inventario.
+		if (userInput <= pickItemsInventory.size())
+		{
+			//If que determinar si al haber un cristal existente en el inventario este no sera incluido en el mismo.
+			if (((pickItemsInventory[userInput - 1] == "Crystallized Azure Dragon's Tears") || (pickItemsInventory[userInput - 1] == "Crystallized Exiled Heretic's Bone") || (pickItemsInventory[userInput - 1] == "Crystallized Great Feline's Ash")) && uniqueCrystalVerification(inventoryRef))
+			{
+				cout << "Sorry, but you can only have one crystal at time." << endl;
+				system("PAUSE");
+			}
+
+			//Else if que a;ade los nuevos objetos al inventario.
+			else if ((pickItemsInventory[userInput - 1] == "Fishermen's Plate") || (pickItemsInventory[userInput - 1] == "Iron Plate") || (pickItemsInventory[userInput - 1] == "Crystallized Azure Dragon's Tears") || (pickItemsInventory[userInput - 1] == "Crystallized Exiled Heretic's Bone") || (pickItemsInventory[userInput - 1] == "Crystallized Great Feline's Ash"))
+			{
+				//If/Else if para limitar la capacidad del inventario y enviar el item seleccionado al inventario.
+				if (inventoryRef.size() >= 20)
+				{
+					cout << "INVENTORY FULL" << endl;
+					system("pause");
+				}
+				else if (inventoryRef.size() < 20)
+				{
+					inventoryRef.push_back(pickItemsInventory[userInput - 1]);
+					cout << "New Item Added!" << endl;
+					cout << "You have " << inventoryRef.size() << " out of 20." << endl;
+					system("pause");
+					pickItemsInventory.erase(pickItemsInventory.begin() + userInput - 1);
+				}
+			}
+		}
+		else if (userInput == pickItemsInventory.size() + 1)
+		{
+			pickUpInventoryOpened = false;
+		}
+	}
+}
+
+//Funcion para verificar si ya existe un cristal en el inventario con un pass by reference.
+bool uniqueCrystalVerification(vector<string> &inventoryRef)
+{
+	int counter = 0;
+
+	//Declaramos variable que nos indica si ya existe un cristal.
+	bool isCrystalPresent = false;
+	bool longBooleanExpression;
+
+	//Ciclo que verifica si ya un cristal.
+	while ((counter < inventoryRef.size()) && (!isCrystalPresent))
+	{
+		//Verificacion de si existen cristales
+		longBooleanExpression = (inventoryRef[counter] == "Crystallized Azure Dragon's Tears") || (inventoryRef[counter] == "Crystallized Exiled Heretic's Bone") || (inventoryRef[counter] == "Crystallized Great Feline's Ash");
+
+		//Si existe el cristal cambiar el valor a true
+		if (longBooleanExpression)
+		{
+			isCrystalPresent = true;
+		}
+
+		//Aumentar el counter, el while no lo realiza.
+		counter++;
+	}
+	return isCrystalPresent;
+}
+
+//Funcion para el inventario con pass by reference.
+void openInventory(vector<string> &inventoryRef, vector<string> &allItemsRef)
+{
+	//Booleana para abrir el inventaro y determinar si se destruyo algun cristal.
+	bool inventoryOpened = true;
+
+	//Variable para entrada del usuario.
+	int userInput;
+	string userInput2;
+
+	//Ciclo para mantener el inventario abierto.
+	while (inventoryOpened)
+	{
+		system("CLS");
+		cout << "===============================================================" << endl;
+		cout << "= = INVENTORY = =" << "\n" << endl;
+
+		//Ciclo que itera sobre el inventario y lo imprime.
+		for (int counter = 0; counter < inventoryRef.size(); counter++)
+		{
+			cout << counter + 1 << ". " << inventoryRef[counter] << endl;
+		}
+
+		cout << inventoryRef.size() + 1 << ". " << "EXIT" << endl;
+		cout << "===============================================================" << endl;
+		cout << "AWAITING USER INPUT:  "; cin >> userInput;
+
+		//Si el usuario introduce el número de algún item, entonces borra el item usando erase(). De otra forma, cierra el inventory. 
+		if (userInput <= inventoryRef.size())
+		{
+			//If para que detecte crystales crudo u opacos y preguntar al usuario si esta seguro de borrarlos del inventario.
+			if (inventoryRef[userInput - 1] == "Crystallized Azure Dragon's Tears" || inventoryRef[userInput - 1] == "Crystallized Exiled Heretic's Bone" || inventoryRef[userInput - 1] == "Crystallized Great Feline's Ash" || inventoryRef[userInput - 1] == "Opaque Azure Dragon's Sapphire" || inventoryRef[userInput - 1] == "Opaque Humanity's Emerald" || inventoryRef[userInput - 1] == "Opaque Feline's Ruby")
+			{
+				cout << " Are you sure you want to destroy this crystal? You won’t be able to gather this unique crystal anymore." << endl;
+				cout << " Press Y/N " << endl;
+				cin >> userInput2;
+
+				//If's que determinara que cristal se escoge y lo reemplazara, para que no se vuelva a generar por el generador o el menu de recoleccion, utilizando punteros ppara cada uno de los cristales.
+				if ((userInput2 == "Y" || userInput2 == "y") && (inventoryRef[userInput - 1] == "Crystallized Azure Dragon's Tears"))
+				{
+					string crystal1 = "Crystallized Azure Dragon's Tears";
+					string *c1;
+					c1 = &crystal1;
+					string ironPlateReplace = "Iron Plate";
+					string *i1;
+					i1 = &ironPlateReplace;
+					allItemsRef = replaceCrystal1(c1, i1, allItemsRef);
+					inventoryRef.erase(inventoryRef.begin() + userInput - 1);
+				}
+				if ((userInput2 == "Y" || userInput2 == "y") && (inventoryRef[userInput - 1] == "Crystallized Exiled Heretic's Bone"))
+				{
+					string crystal2 = "Crystallized Exiled Heretic's Bone";
+					string *c2;
+					c2 = &crystal2;
+					string ironPlateReplace = "Iron Plate";
+					string *i2;
+					i2 = &ironPlateReplace;
+					allItemsRef = replaceCrystal2(c2, i2, allItemsRef);
+					inventoryRef.erase(inventoryRef.begin() + userInput - 1);
+				}
+				if ((userInput2 == "Y" || userInput2 == "y") && (inventoryRef[userInput - 1] == "Crystallized Great Feline's Ash"))
+				{
+					string crystal3 = "Crystallized Great Feline's Ash";
+					string *c3;
+					c3 = &crystal3;
+					string ironPlateReplace = "Iron Plate";
+					string *i3;
+					i3 = &ironPlateReplace;
+					allItemsRef = replaceCrystal3(c3, i3, allItemsRef);
+					inventoryRef.erase(inventoryRef.begin() + userInput - 1);
+				}
+				if ((userInput2 == "Y" || userInput2 == "y") && (inventoryRef[userInput - 1] == "Opaque Azure Dragon's Sapphire"))
+				{
+					inventoryRef.erase(inventoryRef.begin() + userInput - 1);
+				}
+				if ((userInput2 == "Y" || userInput2 == "y") && (inventoryRef[userInput - 1] == "Opaque Humanity's Emerald"))
+				{
+					inventoryRef.erase(inventoryRef.begin() + userInput - 1);
+				}
+				if ((userInput2 == "Y" || userInput2 == "y") && (inventoryRef[userInput - 1] == "Opaque Feline's Ruby"))
+				{
+					inventoryRef.erase(inventoryRef.begin() + userInput - 1);
+				}
+				else if (userInput2 == "N" || userInput2 == "n")
+				{
+					cout << "WOOOW DON'T SCARED US LIKE THAT." << endl;
+					system("pause");
+				}
+			}
+			else if (inventoryRef[userInput - 1] == "Fishermen's Plate" || inventoryRef[userInput - 1] == "Iron Plate")
+			{
+				inventoryRef.erase(inventoryRef.begin() + userInput - 1);
+			}
+		}
+		else if (userInput == inventoryRef.size() + 1)
+		{
+			inventoryOpened = false;
+		}
+	}
+}
+
+//Funcion para crear opaque crystals con un pass by reference.
+void opaqueCraftMenu(vector<string> &inventoryRef)
+{
+	//Variable para mantener el menu abierto.
+	bool craftMenuOpen = true;
+
+	//Entrada del usuario.
+	int craftMenuOption;
+
+	//Ciclo while para mantener el menu abierto.
+	while (craftMenuOpen)
+	{
+		//Variables para crear el item.
+		string rawCrystal = "NA";
+		string *rC;
+		string opaqueCrystal = "NA";
+		string *oC;
+
+		//Variable para reconocer si es el cristal deseado 
+		bool isCrafted = false;
+
+		//UI del menu.
+		system("CLS");
+		cout << "===============================================================" << endl;
+		cout << "= = OPAQUE CRYSTAL CRAFTING = =" << "\n" << endl;
+		cout << "1. Opaque Azure Dragon's Sapphire" << endl;
+		cout << "2. Opaque Humanity's Emerald" << endl;
+		cout << "3. Opaque Feline's Ruby" << endl;
+		cout << "4. Exit" << endl;
+		cout << "===============================================================" << endl;
+		cout << "AWAITING USER INPUT:  "; cin >> craftMenuOption;
+
+		//Switch case para controlar el menu.
+		switch (craftMenuOption)
+		{
+
+		case 1:
+			rawCrystal = "Crystallized Azure Dragon's Tears";
+			rC = &rawCrystal;
+			opaqueCrystal = "Opaque Azure Dragon's Sapphire";
+			oC = &opaqueCrystal;
+			isCrafted = createOpaque(rC, inventoryRef);
+			break;
+
+		case 2:
+			rawCrystal = "Crystallized Exiled Heretic's Bone";
+			rC = &rawCrystal;
+			opaqueCrystal = "Opaque Humanity's Emerald";
+			oC = &opaqueCrystal;
+			isCrafted = createOpaque(rC, inventoryRef);
+			break;
+
+		case 3:
+			rawCrystal = "Crystallized Great Feline's Ash";
+			rC = &rawCrystal;
+			opaqueCrystal = "Opaque Feline's Ruby";
+			oC = &opaqueCrystal;
+			isCrafted = createOpaque(rC, inventoryRef);
+			break;
+
+		case 4:
+			craftMenuOpen = false;
+			break;
+
+		default:
+			system("CLS");
+			break;
+		}
+
+		//Cambiara el inventario cuando se crea un objeto nuevo.
+		if (isCrafted)
+		{
+			rC = &rawCrystal;
+			oC = &opaqueCrystal;
+			inventoryRef = replace(rC, oC, inventoryRef);
+			cout << "Opaque crystal crafted!" << endl;
+			system("pause");
+		}
+	}
+}
+
+//Función que verifica si existe el cristal adecuado en el inventario.
+bool createOpaque(string *rC, vector<string> &inventoryRef)
+{
+	bool isCrafted = false;
+
+	if (find(inventoryRef.begin(), inventoryRef.end(), *rC) != inventoryRef.end())
+	{
+		isCrafted = true;
+	}
+	return isCrafted;
+}
+
+//Función que reemplaza el rawCrystal por el opaqueCrystal. 
+vector<string> replace(string *rC, string *oC, vector<string> &inventoryRef)
+{
+	int counter = 0;
+	bool replaced = false;
+
+	while (counter < inventoryRef.size() && !replaced)
+	{
+		if (inventoryRef[counter] == *rC)
+		{
+			inventoryRef[counter] = *oC;
+			replaced = true;
+		}
+		counter++;
+	}
+	return inventoryRef;
+}
+
+//Funcion que reemplaza azure dragon tears por un iron plate enviando punteros.
+vector<string> replaceCrystal1(string *c1, string *i1, vector<string> &allItemsRef)
+{
+	int counter = 0;
+	bool replaced = false;
+
+	while (counter < allItemsRef.size() && !replaced)
+	{
+		if (allItemsRef[counter] == *c1)
+		{
+			allItemsRef[counter] = *i1;
+			replaced = true;
+		}
+		counter++;
+	}
+	return allItemsRef;
+}
+
+//Funcion que reemplaza heretic bone por un iron plate enviando punteros.
+vector<string> replaceCrystal2(string *c2, string *i2, vector<string> &allItemsRef)
+{
+	int counter = 0;
+	bool replaced = false;
+
+	while (counter < allItemsRef.size() && !replaced)
+	{
+		if (allItemsRef[counter] == *c2)
+		{
+			allItemsRef[counter] = *i2;
+			replaced = true;
+		}
+		counter++;
+	}
+	return allItemsRef;
+}
+
+//Funcion que reemplaza feline ash por un iron plate enviando punteros.
+vector<string> replaceCrystal3(string *c3, string *i3, vector<string> &allItemsRef)
+{
+	int counter = 0;
+	bool replaced = false;
+
+	while (counter < allItemsRef.size() && !replaced)
+	{
+		if (allItemsRef[counter] == *c3)
+		{
+			allItemsRef[counter] = *i3;
+			replaced = true;
+		}
+		counter++;
+	}
+	return allItemsRef;
+}
+
+int main()
+{
+	//RANDOM SEED.
+	srand(time(0));
+
+	//Vector para el inventario y los items disponibles.
+	vector<string> inventory;
+	vector<string> allItems = { "Crystallized Azure Dragon's Tears", "Crystallized Exiled Heretic's Bone", "Crystallized Great Feline's Ash", "Fishermen's Plate", "Iron Plate" };
+
+	//Booleana para mantener el menu abierto.
+	bool menuOpen = true;
+
+	//Entrada del usuario.
+	int mainMenuOption;
+
+	//Ciclo while para mantener el menu abierto.
+	while (menuOpen)
+	{
+
+		//Este comando limpia la ventana de comandos. 
+		system("CLS");
+
+		//UI para el menu
+		cout << "===============================================================" << endl;
+		cout << "= = MAIN MENU = =" << "\n" << endl;
+		cout << "1. INVENTORY GENERATOR (FOR DEVELOPERS)" << endl;
+		cout << "2. OPEN INVENTORY" << endl;
+		cout << "3. PICK UP ITEMS" << endl;
+		cout << "4. CREATE OPAQUE CRYSTAL" << endl;
+		cout << "5. EXIT GAME" << endl;
+		cout << "===============================================================" << endl;
+
+		//Leemos la entrada del usuario. 
+		cout << "AWAITING USER INPUT:  "; cin >> mainMenuOption;
+
+		//Switch para el menu de entrada del usuario.
+		switch (mainMenuOption)
+		{
+
+		case 1:
+			inventory = generateInventory(allItems);
+			break;
+
+		case 2:
+			openInventory(inventory, allItems);
+			break;
+
+		case 3:
+			pickUpInventory(inventory, allItems);
+			break;
+
+		case 4:
+			opaqueCraftMenu(inventory);
+			break;
+
+		case 5:
+			menuOpen = false;
+			break;
+
+		default:
+			system("CLS");
+			break;
+		}
+	}
+	return 0;
+}
