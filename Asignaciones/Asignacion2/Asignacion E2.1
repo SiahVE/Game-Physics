@@ -12,10 +12,10 @@ vector<string> generateInventory(vector<string> &allItemsRef);
 void pickUpInventory(vector<string> &inventoryRef, vector<string> &allItemsRef);
 void openInventory(vector<string> &inventoryRef, vector<string> &allItemsRef);
 void opaqueCraftMenu(vector<string> &inventoryRef);
-vector<string> replace(string *rC, string *oC, vector<string> &inventoryRef);
-vector<string> replaceCrystal1(string *c1, string *i1, vector<string> &allItemsRef);
-vector<string> replaceCrystal2(string *c2, string *i2, vector<string> &allItemsRef);
-vector<string> replaceCrystal3(string *c3, string *i3, vector<string> &allItemsRef);
+void replace(string *rC, string *oC, vector<string> &inventoryRef);
+void replaceCrystal1(string *c1, string *i1, vector<string> &allItemsRef);
+void replaceCrystal2(string *c2, string *i2, vector<string> &allItemsRef);
+void replaceCrystal3(string *c3, string *i3, vector<string> &allItemsRef);
 bool createOpaque(string *rC, vector<string> &inventoryRef);
 bool uniqueCrystalVerification(vector<string> &inventoryRef);
 
@@ -85,6 +85,7 @@ void pickUpInventory(vector<string> &inventoryRef, vector<string> &allItemsRef)
 	bool containsCrystal = false;
 	bool longBooleanExpression;
 	bool shortBooleanExpression;
+	bool noMoreFishPls;
 
 	//Ciclo que genera los 5 objetos aleatorias para escoger del usuario.
 	while (counter < pickItemsInventory.size())
@@ -128,6 +129,9 @@ void pickUpInventory(vector<string> &inventoryRef, vector<string> &allItemsRef)
 		//If para determinar los objetos que pasaran al inventario.
 		if (userInput <= pickItemsInventory.size())
 		{
+			//Bool para determinar que ya existen 3 fishermen plate en el inventory.
+			noMoreFishPls = (count(inventoryRef.begin(), inventoryRef.end(), "Fishermen's Plate") >= 3);
+
 			//If que determinar si al haber un cristal existente en el inventario este no sera incluido en el mismo.
 			if (((pickItemsInventory[userInput - 1] == "Crystallized Azure Dragon's Tears") || (pickItemsInventory[userInput - 1] == "Crystallized Exiled Heretic's Bone") || (pickItemsInventory[userInput - 1] == "Crystallized Great Feline's Ash")) && uniqueCrystalVerification(inventoryRef))
 			{
@@ -144,6 +148,14 @@ void pickUpInventory(vector<string> &inventoryRef, vector<string> &allItemsRef)
 					cout << "INVENTORY FULL" << endl;
 					system("pause");
 				}
+
+				//Else if que si existen 3 fishermen plate en el inventario y el usuario intenta escoger uno mas este no lo permitira.
+				else if (noMoreFishPls && pickItemsInventory[userInput - 1] == "Fishermen's Plate")
+				{
+					cout << "Sorry, but you can only have three Fishermen's Plate at time." << endl;
+					system("PAUSE");
+				}
+
 				else if (inventoryRef.size() < 20)
 				{
 					inventoryRef.push_back(pickItemsInventory[userInput - 1]);
@@ -225,7 +237,7 @@ void openInventory(vector<string> &inventoryRef, vector<string> &allItemsRef)
 				cout << " Press Y/N " << endl;
 				cin >> userInput2;
 
-				//If's que determinara que cristal se escoge y lo reemplazara, para que no se vuelva a generar por el generador o el menu de recoleccion, utilizando punteros ppara cada uno de los cristales.
+				//If's que determinara que cristal se escoge y lo reemplazara, para que no se vuelva a generar por el generador o el menu de recoleccion, utilizando punteros para cada uno de los cristales.
 				if ((userInput2 == "Y" || userInput2 == "y") && (inventoryRef[userInput - 1] == "Crystallized Azure Dragon's Tears"))
 				{
 					string crystal1 = "Crystallized Azure Dragon's Tears";
@@ -234,7 +246,7 @@ void openInventory(vector<string> &inventoryRef, vector<string> &allItemsRef)
 					string ironPlateReplace = "Iron Plate";
 					string *i1;
 					i1 = &ironPlateReplace;
-					allItemsRef = replaceCrystal1(c1, i1, allItemsRef);
+					replaceCrystal1(c1, i1, allItemsRef);
 					inventoryRef.erase(inventoryRef.begin() + userInput - 1);
 				}
 				if ((userInput2 == "Y" || userInput2 == "y") && (inventoryRef[userInput - 1] == "Crystallized Exiled Heretic's Bone"))
@@ -245,7 +257,7 @@ void openInventory(vector<string> &inventoryRef, vector<string> &allItemsRef)
 					string ironPlateReplace = "Iron Plate";
 					string *i2;
 					i2 = &ironPlateReplace;
-					allItemsRef = replaceCrystal2(c2, i2, allItemsRef);
+					replaceCrystal2(c2, i2, allItemsRef);
 					inventoryRef.erase(inventoryRef.begin() + userInput - 1);
 				}
 				if ((userInput2 == "Y" || userInput2 == "y") && (inventoryRef[userInput - 1] == "Crystallized Great Feline's Ash"))
@@ -256,7 +268,7 @@ void openInventory(vector<string> &inventoryRef, vector<string> &allItemsRef)
 					string ironPlateReplace = "Iron Plate";
 					string *i3;
 					i3 = &ironPlateReplace;
-					allItemsRef = replaceCrystal3(c3, i3, allItemsRef);
+					replaceCrystal3(c3, i3, allItemsRef);
 					inventoryRef.erase(inventoryRef.begin() + userInput - 1);
 				}
 				if ((userInput2 == "Y" || userInput2 == "y") && (inventoryRef[userInput - 1] == "Opaque Azure Dragon's Sapphire"))
@@ -363,7 +375,7 @@ void opaqueCraftMenu(vector<string> &inventoryRef)
 		{
 			rC = &rawCrystal;
 			oC = &opaqueCrystal;
-			inventoryRef = replace(rC, oC, inventoryRef);
+			replace(rC, oC, inventoryRef);
 			cout << "Opaque crystal crafted!" << endl;
 			system("pause");
 		}
@@ -383,7 +395,7 @@ bool createOpaque(string *rC, vector<string> &inventoryRef)
 }
 
 //Función que reemplaza el rawCrystal por el opaqueCrystal. 
-vector<string> replace(string *rC, string *oC, vector<string> &inventoryRef)
+void replace(string *rC, string *oC, vector<string> &inventoryRef)
 {
 	int counter = 0;
 	bool replaced = false;
@@ -397,11 +409,11 @@ vector<string> replace(string *rC, string *oC, vector<string> &inventoryRef)
 		}
 		counter++;
 	}
-	return inventoryRef;
+	//return inventoryRef;
 }
 
 //Funcion que reemplaza azure dragon tears por un iron plate enviando punteros.
-vector<string> replaceCrystal1(string *c1, string *i1, vector<string> &allItemsRef)
+void replaceCrystal1(string *c1, string *i1, vector<string> &allItemsRef)
 {
 	int counter = 0;
 	bool replaced = false;
@@ -415,11 +427,11 @@ vector<string> replaceCrystal1(string *c1, string *i1, vector<string> &allItemsR
 		}
 		counter++;
 	}
-	return allItemsRef;
+	//return allItemsRef;
 }
 
 //Funcion que reemplaza heretic bone por un iron plate enviando punteros.
-vector<string> replaceCrystal2(string *c2, string *i2, vector<string> &allItemsRef)
+void replaceCrystal2(string *c2, string *i2, vector<string> &allItemsRef)
 {
 	int counter = 0;
 	bool replaced = false;
@@ -433,11 +445,11 @@ vector<string> replaceCrystal2(string *c2, string *i2, vector<string> &allItemsR
 		}
 		counter++;
 	}
-	return allItemsRef;
+	//return allItemsRef;
 }
 
 //Funcion que reemplaza feline ash por un iron plate enviando punteros.
-vector<string> replaceCrystal3(string *c3, string *i3, vector<string> &allItemsRef)
+void replaceCrystal3(string *c3, string *i3, vector<string> &allItemsRef)
 {
 	int counter = 0;
 	bool replaced = false;
@@ -451,7 +463,7 @@ vector<string> replaceCrystal3(string *c3, string *i3, vector<string> &allItemsR
 		}
 		counter++;
 	}
-	return allItemsRef;
+	//return allItemsRef;
 }
 
 int main()
