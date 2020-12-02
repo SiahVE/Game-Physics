@@ -69,9 +69,11 @@ void Simulation::handleEvents()
 
 void Simulation::update(float dt)
 {
+	//Se crea contador para generar el movimiento
 	timeCount += dt;
-	float y1 = 300.0f + 200.0f * sin (5.0f * timeCount);
-	float y2 = 300.0f + 200.0f * sin(2.0f * timeCount);
+	//Se crea distintas variables "x" y "y" para generar el movimiento de varias cajas por separadas, y con modificaciones en sus valores para obtener distintas velocidades y amplitudes distintas
+	float y1 = 300.0f + 200.0f * sin(5.0f * timeCount);
+	float y2 = 300.0f + 100.0f * sin(2.0f * timeCount);
 	float x1 = 300.0f + 200.0f * sin(4.0f * timeCount);
 	boxTest->update(500.0, y1, 92.5f, 52.0f);
 	boxTest2->update(700.0, y2, 92.5f, 52.0f);
